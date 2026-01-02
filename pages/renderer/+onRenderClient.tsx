@@ -1,5 +1,7 @@
 import React from "react";
 import { hydrateRoot } from "react-dom/client";
+// @ts-expect-error css module
+import "../../src/index.css";
 
 export { onRenderClient };
 

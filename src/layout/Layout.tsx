@@ -3,9 +3,9 @@ import Nav from "../components/Nav";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
-    <div style={{ padding: 24 }}>
+    <div>
       <Nav />
-      <main style={{ marginTop: 20 }}>{children}</main>
+      <main>{children}</main>
     </div>
   );
 }
