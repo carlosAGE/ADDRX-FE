@@ -1,26 +1,37 @@
-export default function Nav() {
-  const linkStyle: React.CSSProperties = {
-    padding: "10px 14px",
-    border: "1px solid rgba(255,255,255,0.2)",
-    borderRadius: 10,
-    textDecoration: "none",
-    display: "inline-block",
-  };
+import { styled } from "styled-components";
 
+const StyledNav = styled.nav`
+  display: flex;
+  flex-wrap: wrap;
+  .navContainer {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    gap: 12px;
+  }
+`;
+
+const StyledLink = styled.a`
+  padding: 10px 14px;
+  border-bottom: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: 0px;
+  color: ${(props) => props.theme.colors.text};
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.surface2};
+    color: ${(props) => props.theme.colors.textMuted};
+  }
+`;
+
+export default function Nav() {
   return (
-    <nav style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-      <a href="/" style={linkStyle}>
-        Home
-      </a>
-      <a href="/about" style={linkStyle}>
-        About
-      </a>
-      <a href="/contact" style={linkStyle}>
-        Contact
-      </a>
-      <a href="/archive" style={linkStyle}>
-        Archive
-      </a>
-    </nav>
+    <StyledNav>
+      <div className="navContainer">
+        <StyledLink href="/">Home</StyledLink>
+        <StyledLink href="/about">About</StyledLink>
+        <StyledLink href="/contact">Contact</StyledLink>
+        <StyledLink href="/archive">Archive</StyledLink>
+      </div>
+    </StyledNav>
   );
 }
