@@ -1,8 +1,9 @@
+import Layout from "../../src/layout/Layout";
+
 export default function Page() {
   return (
-    <main>
-      <h1>ADDRX</h1>
-      <p>Short, clear value prop.</p>
-    </main>
+    <Layout>
+      <h1>ADDRX HOME</h1>
+    </Layout>
   );
 }
