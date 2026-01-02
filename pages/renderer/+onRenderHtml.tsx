@@ -1,12 +1,20 @@
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { ThemeProvider } from "styled-components";
+import { chromeNeutral } from "../../src/theme/chromeNeutral";
+import { GlobalStyle } from "../../src/theme/GlobalStyle";
 import { escapeInject, dangerouslySkipEscape } from "vike/server";
 
 export { onRenderHtml };
 
 function onRenderHtml(pageContext: any) {
   const { Page, pageProps } = pageContext;
-  const pageHtml = renderToString(<Page {...pageProps} />);
+  const pageHtml = renderToString(
+    <ThemeProvider theme={chromeNeutral}>
+      <GlobalStyle />
+      <Page {...pageProps} />
+    </ThemeProvider>
+  );
 
   return escapeInject`<!DOCTYPE html>
     <html lang="en">
