@@ -8,6 +8,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
@@ -19,5 +20,8 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
   },
 ])

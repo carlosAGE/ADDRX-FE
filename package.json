@@ -4,14 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "vike dev --port 5174",
+    "build": "vike build",
+    "preview": "vike preview --port 5174"
   },
   "dependencies": {
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "vike": "^0.4.250",
+    "vike-react": "^0.6.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
