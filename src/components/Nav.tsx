@@ -1,11 +1,12 @@
-import { styled } from "styled-components";
+import { styled, useTheme } from "styled-components";
+import AX from "../../public/icons/AX";
 
 const StyledNav = styled.nav`
   display: flex;
   flex-wrap: wrap;
+
   .navContainer {
     display: flex;
-    width: 100%;
     justify-content: center;
     gap: 12px;
   }
@@ -24,13 +25,24 @@ const StyledLink = styled.a`
 `;
 
 export default function Nav() {
+  const theme = useTheme() as any;
   return (
     <StyledNav>
       <div className="navContainer">
-        <StyledLink href="/">Home</StyledLink>
-        <StyledLink href="/about">About</StyledLink>
-        <StyledLink href="/contact">Contact</StyledLink>
-        <StyledLink href="/archive">Archive</StyledLink>
+        <div className="iconContainer">
+          {/* icon from public/AX.png */}
+          <AX
+            style={{ width: "10rem", height: "10rem" }}
+            fill={theme.colors.text}
+          />
+          <div>ADDRX</div>
+        </div>
+        <div className="linksContainer">
+          <StyledLink href="/">Home</StyledLink>
+          <StyledLink href="/about">About</StyledLink>
+          <StyledLink href="/contact">Contact</StyledLink>
+          <StyledLink href="/archive">Archive</StyledLink>
+        </div>
       </div>
     </StyledNav>
   );
