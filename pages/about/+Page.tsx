@@ -1,8 +1,10 @@
+import Layout from "../../src/layout/Layout";
+
 export default function Page() {
   return (
-    <main>
+    <Layout>
       <h1>ADDRX</h1>
       <p>ABOUT</p>
-    </main>
+    </Layout>
   );
 }

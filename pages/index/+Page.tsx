@@ -1,9 +1,5 @@
 import Layout from "../../src/layout/Layout";
 
 export default function Page() {
-  return (
-    <Layout>
-      <h1>ADDRX HOME !</h1>
-    </Layout>
-  );
+  return <Layout>A</Layout>;
 }

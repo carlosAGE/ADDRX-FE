@@ -14,15 +14,14 @@ function onRenderHtml(pageContext: any) {
 
   try {
     const appHtml = renderToString(
-      sheet.collectStyles(
-        <ThemeProvider theme={chromeNeutral}>
-          <GlobalStyle />
-          <Page {...pageProps} />
-        </ThemeProvider>
-      )
+      <ThemeProvider theme={chromeNeutral}>
+        {/* ✅ keep globals outside the sheet collector */}
+        <GlobalStyle />
+        {sheet.collectStyles(<Page {...pageProps} />)}
+      </ThemeProvider>
     );
 
-    const styleTags = sheet.getStyleTags(); // string of <style>...</style>
+    const styleTags = sheet.getStyleTags();
 
     return escapeInject`<!DOCTYPE html>
       <html lang="en">
