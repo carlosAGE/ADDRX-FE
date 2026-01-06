@@ -1,5 +1,6 @@
 import Layout from "../../src/layout/Layout";
 import { styled } from "styled-components";
+import ChatDemoCard from "../../src/components/demos/chatDemo/ChatDemoCard";
 
 const StyledHome = styled.div`
   display: flex;
@@ -12,12 +13,7 @@ export default function Page() {
   return (
     <Layout>
       <StyledHome>
-        <div>Custom tooling to get ahead of the competition</div>
-        <div>HOT</div>
-        <div>
-          <div>CHAT</div>
-          <div>INPUT</div>
-        </div>
+        <ChatDemoCard />
       </StyledHome>
     </Layout>
   );

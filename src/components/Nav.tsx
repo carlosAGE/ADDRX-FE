@@ -134,10 +134,10 @@ export default function Nav() {
     <StyledNav $mounted={mounted}>
       <div className="navContainer">
         <div className="linksContainer">
-          <div className="leftGroup">
-            <StyledLink href="/">Home</StyledLink>
-            <StyledLink href="/about">About</StyledLink>
-          </div>
+          {/* <div className="leftGroup"> */}
+          {/* <StyledLink href="/">Home</StyledLink>
+            <StyledLink href="/about">About</StyledLink> */}
+          {/* </div> */}
 
           <div className="iconContainer">
             <button
@@ -153,10 +153,10 @@ export default function Nav() {
             </button>
           </div>
 
-          <div className="rightGroup">
-            <StyledLink href="/contact">Contact</StyledLink>
-            <StyledLink href="/archive">Archive</StyledLink>
-          </div>
+          {/* <div className="rightGroup"> */}
+          {/* <StyledLink href="/contact">Contact</StyledLink>
+            <StyledLink href="/archive">Archive</StyledLink> */}
+          {/* </div> */}
         </div>
       </div>
     </StyledNav>
