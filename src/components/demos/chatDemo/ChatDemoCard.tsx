@@ -2,6 +2,7 @@ import React from "react";
 import Card from "../../Card/Card";
 import { styled } from "styled-components";
 import ModeSelect from "../../Selectors/ModeSelect";
+import ChatDemo from "./ChatDemo";
 
 const StyledDemoCardComponent = styled.div``;
 
@@ -33,8 +34,16 @@ const CHAT_TYPES = {
   [CUSTOM_TAILORED]: description6,
 };
 
+type ChatType =
+  | typeof SEA_NATIVE
+  | typeof OPS_CONTROL
+  | typeof INSTANT_CHAT
+  | typeof COMPLIANCE_GUARD
+  | typeof OFFLINE
+  | typeof CUSTOM_TAILORED;
+
 export default function ChatDemoCard() {
-  const [chatType, setChatType] = React.useState(SEA_NATIVE);
+  const [chatType, setChatType] = React.useState<ChatType>(SEA_NATIVE);
 
   return (
     <Card>
@@ -82,13 +91,11 @@ export default function ChatDemoCard() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            marginTop: "20px",
-            marginBottom: "20px",
           }}
         >
           <ModeSelect
             value={chatType}
-            onChange={setChatType}
+            onChange={(value: string) => setChatType(value as ChatType)}
             options={[
               { value: SEA_NATIVE, label: "SEA Native" },
               { value: OPS_CONTROL, label: "Ops Control" },
@@ -99,9 +106,18 @@ export default function ChatDemoCard() {
             ]}
           />
         </div>
-
-        <div className="chatWindow">CHAT WINDOW TYPE HERE</div>
-        <div className="chatInput">INPUT AREA TYPE HERE</div>
+        <div
+          style={{
+            marginTop: "0rem",
+            marginBottom: ".5rem",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <p>{CHAT_TYPES[chatType]}</p>
+        </div>
+        <ChatDemo chatType={chatType} />
       </StyledDemoCardComponent>
     </Card>
   );

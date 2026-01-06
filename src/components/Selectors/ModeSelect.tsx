@@ -81,7 +81,7 @@ const Root = styled(RadioGroup.Root)`
   padding: 6px 8px;
   /* border-radius: 14px; */
   border: 1px solid ${({ theme }) => theme.colors.border};
-  background: rgba(255, 255, 255, 0.03);
+  background: ${({ theme }) => theme.colors.surface};
 `;
 
 /* The moving highlight */
