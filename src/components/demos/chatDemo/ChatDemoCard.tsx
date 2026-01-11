@@ -74,17 +74,6 @@ export default function ChatDemoCard() {
         >
           <h3>Not all AIs are created equal</h3>
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: "20px",
-            marginBottom: "20px",
-          }}
-        >
-          <h4>Power your business with the right tool for the job</h4>
-        </div>
 
         <div
           style={{

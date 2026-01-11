@@ -1,6 +1,7 @@
 import Layout from "../../src/layout/Layout";
 import { styled } from "styled-components";
 import ChatDemoCard from "../../src/components/demos/chatDemo/ChatDemoCard";
+import { SlideInBot } from "../../src/components/Wrappers/Animations/SlideInBot";
 
 const StyledHome = styled.div`
   display: flex;
@@ -12,9 +13,11 @@ const StyledHome = styled.div`
 export default function Page() {
   return (
     <Layout>
-      <StyledHome>
-        <ChatDemoCard />
-      </StyledHome>
+      <SlideInBot>
+        <StyledHome>
+          <ChatDemoCard />
+        </StyledHome>
+      </SlideInBot>
     </Layout>
   );
 }
