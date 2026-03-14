@@ -108,18 +108,18 @@ const StyledNav = styled.nav<{ $mounted: boolean }>`
   }
 `;
 
-const StyledLink = styled.a`
-  display: inline-block;
-  padding: 10px 14px;
-  color: ${(props) => props.theme.colors.text};
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
-  transition: border-color 0.15s ease, color 0.15s ease;
+// const StyledLink = styled.a`
+//   display: inline-block;
+//   padding: 10px 14px;
+//   color: ${(props) => props.theme.colors.text};
+//   text-decoration: none;
+//   border-bottom: 2px solid transparent;
+//   transition: border-color 0.15s ease, color 0.15s ease;
 
-  &:hover {
-    box-shadow: inset 0 -1px 0 ${(props) => props.theme.colors.surface2};
-  }
-`;
+//   &:hover {
+//     box-shadow: inset 0 -1px 0 ${(props) => props.theme.colors.surface2};
+//   }
+// `;
 
 export default function Nav() {
   const theme = useTheme() as any;
