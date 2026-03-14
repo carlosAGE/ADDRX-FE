@@ -4,7 +4,8 @@ import ContentItem from './ContentItem.tsx';
 import FeedDropdown from './FeedDropdown.tsx';
 import Bio from './Bio.tsx';
 import Topics, { type TopicType } from './Topics.tsx';
-import { mockFetchContentBatch, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './mockApi.ts';
+import PostDetailsContainer from './PostDetailsContainer.tsx';
+import { mockFetchContentBatch, mockFetchPostById, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './mockApi.ts';
 
 const MainLayout = styled.div`
   display: grid;
@@ -21,9 +22,34 @@ const MainLayout = styled.div`
   }
 `;
 
-const FeedContainer = styled.div`
+const FeedContainer = styled.div<{ $isVisible: boolean }>`
   max-width: 100%;
   width: 100%;
+  transition: all 0.3s ease-out;
+  transform: translateX(${({ $isVisible }) => $isVisible ? '0' : '-100%'});
+  opacity: ${({ $isVisible }) => $isVisible ? '1' : '0'};
+  ${({ $isVisible }) => !$isVisible && 'pointer-events: none;'}
+`;
+
+const PostContainer = styled.div<{ $isVisible: boolean }>`
+  max-width: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: all 0.3s ease-out;
+  transform: translateX(${({ $isVisible }) => $isVisible ? '0' : '100%'});
+  opacity: ${({ $isVisible }) => $isVisible ? '1' : '0'};
+  ${({ $isVisible }) => !$isVisible && 'pointer-events: none;'}
+  z-index: ${({ $isVisible }) => $isVisible ? '2' : '1'};
+`;
+
+const ContentWrapper = styled.div`
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
 `;
 
 const SidebarContainer = styled.div`
@@ -90,9 +116,30 @@ const InfiniteContentFeed: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [activeTopic, setActiveTopic] = useState<TopicType>('daily');
+  const [currentView, setCurrentView] = useState<'feed' | 'post'>('feed');
+  const [selectedPost, setSelectedPost] = useState<ContentItemType | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadingElementRef = useRef<HTMLDivElement | null>(null);
 
+  const handleViewPost = useCallback((post: ContentItemType) => {
+    setSelectedPost(post);
+    setCurrentView('post');
+    
+    // Update URL for the specific post
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('post', post.id);
+    window.history.pushState({}, '', newUrl);
+  }, []);
+
+  const handleBackToFeed = useCallback(() => {
+    setCurrentView('feed');
+    setSelectedPost(null);
+    
+    // Remove post parameter from URL
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('post');
+    window.history.replaceState({}, '', newUrl);
+  }, []);
   const loadMoreContent = useCallback(async () => {
     if (loading || !hasMore) return;
 
@@ -106,20 +153,22 @@ const InfiniteContentFeed: React.FC = () => {
         setItems(prev => [...prev, ...newItems]);
         setCurrentBatch(prev => prev + 1);
         
-        // Update URL for SEO
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('batch', currentBatch.toString());
-        if (sortBy !== 'newest') newUrl.searchParams.set('sort', sortBy);
-        if (filterBy !== 'all') newUrl.searchParams.set('filter', filterBy);
-        if (activeTopic !== 'daily') newUrl.searchParams.set('topic', activeTopic);
-        window.history.replaceState({}, '', newUrl);
+        // Update URL for SEO (only if in feed view)
+        if (currentView === 'feed') {
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('batch', currentBatch.toString());
+          if (sortBy !== 'newest') newUrl.searchParams.set('sort', sortBy);
+          if (filterBy !== 'all') newUrl.searchParams.set('filter', filterBy);
+          if (activeTopic !== 'daily') newUrl.searchParams.set('topic', activeTopic);
+          window.history.replaceState({}, '', newUrl);
+        }
       }
     } catch (error) {
       console.error('Error loading content:', error);
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentBatch, sortBy, filterBy, activeTopic]);
+  }, [loading, hasMore, currentBatch, sortBy, filterBy, activeTopic, currentView]);
 
   // Intersection Observer setup
   useEffect(() => {
@@ -201,6 +250,7 @@ const InfiniteContentFeed: React.FC = () => {
     const urlFilter = urlParams.get('filter') as FilterOption;
     const urlTopic = urlParams.get('topic') as TopicType;
     const urlBatch = urlParams.get('batch');
+    const urlPost = urlParams.get('post');
 
     if (urlSort && ['newest', 'oldest', 'popular'].includes(urlSort)) {
       setSortBy(urlSort);
@@ -214,6 +264,32 @@ const InfiniteContentFeed: React.FC = () => {
     if (urlBatch && !isNaN(Number(urlBatch))) {
       setCurrentBatch(Number(urlBatch));
     }
+    
+    // If there's a post parameter, load that specific post
+    if (urlPost) {
+      const loadSpecificPost = async () => {
+        try {
+          const post = await mockFetchPostById(urlPost);
+          if (post) {
+            setSelectedPost(post);
+            setCurrentView('post');
+          } else {
+            // Post not found, redirect back to feed
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.delete('post');
+            window.history.replaceState({}, '', newUrl);
+          }
+        } catch (error) {
+          console.error('Error loading post:', error);
+          // On error, redirect back to feed
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.delete('post');
+          window.history.replaceState({}, '', newUrl);
+        }
+      };
+      
+      loadSpecificPost();
+    }
   }, []);
 
   return (
@@ -225,32 +301,47 @@ const InfiniteContentFeed: React.FC = () => {
         />
       </SidebarContainer>
       
-      <FeedContainer>
-        <FeedHeader>
-          <Bio />
-        </FeedHeader>
-        
-        <FeedGrid>
-          {items.map((item) => (
-            <ContentItem key={item.id} item={item} />
-          ))}
-        </FeedGrid>
-
-        <div ref={loadingElementRef}>
-          {loading && (
-            <LoadingIndicator>
-              <LoadingSpinner />
-              Loading more content...
-            </LoadingIndicator>
-          )}
+      <ContentWrapper>
+        <FeedContainer $isVisible={currentView === 'feed'}>
+          <FeedHeader>
+            <Bio />
+          </FeedHeader>
           
-          {!hasMore && items.length > 0 && (
-            <EndMessage>
-              You've reached the end of the feed
-            </EndMessage>
+          <FeedGrid>
+            {items.map((item) => (
+              <ContentItem 
+                key={item.id} 
+                item={item} 
+                onViewPost={handleViewPost}
+              />
+            ))}
+          </FeedGrid>
+
+          <div ref={loadingElementRef}>
+            {loading && (
+              <LoadingIndicator>
+                <LoadingSpinner />
+                Loading more content...
+              </LoadingIndicator>
+            )}
+            
+            {!hasMore && items.length > 0 && (
+              <EndMessage>
+                You've reached the end of the feed
+              </EndMessage>
+            )}
+          </div>
+        </FeedContainer>
+
+        <PostContainer $isVisible={currentView === 'post'}>
+          {selectedPost && (
+            <PostDetailsContainer 
+              item={selectedPost}
+              onBack={handleBackToFeed}
+            />
           )}
-        </div>
-      </FeedContainer>
+        </PostContainer>
+      </ContentWrapper>
 
       <SidebarContainer>
         <FeedDropdown 

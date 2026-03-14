@@ -193,3 +193,17 @@ export const mockFetchContentBatch = async (
 
   return content;
 };
+
+// Mock function to fetch a single post by ID
+export const mockFetchPostById = async (postId: string): Promise<ContentItem | null> => {
+    // Simulate network delay
+    await delay(200 + Math.random() * 300);
+
+    // Extract the numeric ID from the post ID format "content-123"
+    const numericId = parseInt(postId.replace('content-', ''));
+    if (isNaN(numericId)) return null;
+
+    // Generate the specific post with the given ID
+    const posts = generateMockContent(numericId, 1);
+    return posts.length > 0 ? posts[0] : null;
+};

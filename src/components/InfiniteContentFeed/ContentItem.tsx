@@ -150,9 +150,10 @@ const ItemAction = styled.button`
 
 interface ContentItemProps {
   item: ContentItemType;
+  onViewPost: (post: ContentItemType) => void;
 }
 
-const ContentItem: React.FC<ContentItemProps> = ({ item }) => {
+const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -199,7 +200,7 @@ const ContentItem: React.FC<ContentItemProps> = ({ item }) => {
             </ItemStat>
           )}
         </ItemStats>
-        <ItemAction>
+        <ItemAction onClick={() => onViewPost(item)}>
           View Details
         </ItemAction>
       </ItemFooter>
