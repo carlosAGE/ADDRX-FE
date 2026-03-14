@@ -3,6 +3,25 @@ import { styled } from 'styled-components';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import type { SortOption, FilterOption } from './mockApi';
 
+const SidebarContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.space.lg};
+  padding: ${({ theme }) => theme.space.lg};
+  position: sticky;
+  top: ${({ theme }) => theme.space.lg};
+  height: fit-content;
+`;
+
+const SidebarTitle = styled.h3`
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textMuted};
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
 const DropdownTrigger = styled(DropdownMenu.Trigger)`
   display: flex;
   align-items: center;
@@ -16,7 +35,7 @@ const DropdownTrigger = styled(DropdownMenu.Trigger)`
   font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 120px;
+  width: 100%;
   justify-content: space-between;
 
   &:hover {
@@ -174,42 +193,45 @@ const FeedDropdown: React.FC<FeedDropdownProps> = ({
   };
 
   return (
-    <DropdownMenu.Root open={open} onOpenChange={setOpen}>
-      <DropdownTrigger>
-        {getCurrentLabel()}
-        <TriggerIcon $isOpen={open}>▼</TriggerIcon>
-      </DropdownTrigger>
+    <SidebarContainer>
+      <SidebarTitle>Filters</SidebarTitle>
+      <DropdownMenu.Root open={open} onOpenChange={setOpen}>
+        <DropdownTrigger>
+          {getCurrentLabel()}
+          <TriggerIcon $isOpen={open}>▼</TriggerIcon>
+        </DropdownTrigger>
 
-      <DropdownMenu.Portal>
-        <DropdownContent sideOffset={5} align="end">
-          <DropdownSection>
-            <DropdownLabel>Sort By</DropdownLabel>
-            {sortOptions.map((option) => (
-              <DropdownItem
-                key={option.value}
-                onClick={() => onSortChange(option.value)}
-              >
-                <DropdownCheckbox $checked={sortBy === option.value} />
-                {option.label}
-              </DropdownItem>
-            ))}
-          </DropdownSection>
+        <DropdownMenu.Portal>
+          <DropdownContent sideOffset={5} align="end">
+            <DropdownSection>
+              <DropdownLabel>Sort By</DropdownLabel>
+              {sortOptions.map((option) => (
+                <DropdownItem
+                  key={option.value}
+                  onClick={() => onSortChange(option.value)}
+                >
+                  <DropdownCheckbox $checked={sortBy === option.value} />
+                  {option.label}
+                </DropdownItem>
+              ))}
+            </DropdownSection>
 
-          <DropdownSection>
-            <DropdownLabel>Filter</DropdownLabel>
-            {filterOptions.map((option) => (
-              <DropdownItem
-                key={option.value}
-                onClick={() => onFilterChange(option.value)}
-              >
-                <DropdownCheckbox $checked={filterBy === option.value} />
-                {option.label}
-              </DropdownItem>
-            ))}
-          </DropdownSection>
-        </DropdownContent>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+            <DropdownSection>
+              <DropdownLabel>Filter</DropdownLabel>
+              {filterOptions.map((option) => (
+                <DropdownItem
+                  key={option.value}
+                  onClick={() => onFilterChange(option.value)}
+                >
+                  <DropdownCheckbox $checked={filterBy === option.value} />
+                  {option.label}
+                </DropdownItem>
+              ))}
+            </DropdownSection>
+          </DropdownContent>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+    </SidebarContainer>
   );
 };
 

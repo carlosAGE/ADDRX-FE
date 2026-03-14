@@ -1,11 +1,13 @@
 export type SortOption = 'newest' | 'oldest' | 'popular';
 export type FilterOption = 'all' | 'featured' | 'trending';
+export type TopicType = 'daily' | 'team' | 'services' | 'thoughts';
 
 export interface ContentItem {
   id: string;
   title: string;
   description: string;
   category: 'featured' | 'trending' | 'regular';
+    topic: TopicType;
   createdAt: string;
   views: number;
   likes: number;
@@ -19,45 +21,65 @@ export interface ContentItem {
 // Mock data generator
 const generateMockContent = (startId: number, count: number = 10): ContentItem[] => {
   const categories: ContentItem['category'][] = ['featured', 'trending', 'regular'];
-  const titles = [
-    'Exploring Modern Web Development Patterns',
-    'The Future of Remote Work Culture',
-    'Sustainable Technology Practices',
-    'Understanding User Experience Design',
-    'Building Resilient Digital Communities',
-    'The Art of Minimalist Architecture',
-    'Innovations in Sustainable Living',
-    'Digital Transformation Strategies',
-    'Creative Problem-Solving Methods',
-    'The Psychology of Product Design',
-    'Emerging Trends in Data Visualization',
-    'Crafting Authentic Brand Stories',
-    'The Philosophy of Calm Technology',
-    'Building Inclusive Digital Spaces',
-    'The Science of Effective Communication',
-    'Exploring Cultural Design Patterns',
-    'The Future of Human-Computer Interaction',
-    'Sustainable Business Model Innovation',
-    'The Art of Thoughtful Leadership',
-    'Creating Meaningful User Journeys',
-  ];
+    const topics: TopicType[] = ['daily', 'team', 'services', 'thoughts'];
 
-  const descriptions = [
-    'A deep dive into modern approaches to creating digital experiences that prioritize user needs while maintaining technical excellence.',
-    'Examining how organizations are reshaping work culture to embrace flexibility, creativity, and human-centered values.',
-    'Exploring practical methods for integrating sustainability into technology development and deployment processes.',
-    'Understanding the principles that guide exceptional user experience design and their impact on digital products.',
-    'Investigating strategies for fostering authentic connections and engagement in digital community spaces.',
-    'An exploration of minimalist architectural principles and their application in contemporary design practices.',
-    'Discovering innovative approaches to sustainable living that blend technology with environmental consciousness.',
-    'Strategic frameworks for organizations navigating the complexities of digital transformation initiatives.',
-    'Methodologies for approaching complex challenges with creativity, empathy, and systematic thinking.',
-    'Psychological insights that inform effective product design decisions and user interaction patterns.',
-  ];
+    const titlesByTopic = {
+        daily: [
+            'Daily Updates from Our Development Team',
+            'Morning Coffee Chat: Industry Insights',
+            'Today\'s Featured Project Spotlight',
+            'Daily Dose of Creative Inspiration',
+            'Breaking: Latest Technology Trends',
+        ],
+        team: [
+            'Meet Our Lead Designer: Sarah Chen',
+            'Behind the Scenes: Our Development Process',
+            'Team Spotlight: Engineering Excellence',
+            'Our Culture: Building Together',
+            'Employee Spotlight: Innovation at Work',
+        ],
+        services: [
+            'Custom Web Development Solutions',
+            'Brand Identity & Visual Design',
+            'Full-Stack Technical Consulting',
+            'User Experience Design Services',
+            'Digital Strategy & Implementation',
+        ],
+        thoughts: [
+            'The Future of Minimalist Design',
+            'Reflections on Sustainable Development',
+            'Why Simplicity Wins in User Experience',
+            'Building Authentic Digital Relationships',
+            'The Philosophy Behind Our Approach',
+        ],
+    };
+
+    const descriptionsByTopic = {
+        daily: [
+            'Stay up to date with our latest project developments, team insights, and daily discoveries in the world of digital design.',
+            'Fresh perspectives and industry updates from our team, delivered daily to keep you informed and inspired.',
+            'A glimpse into our ongoing projects, daily learnings, and the creative process behind our boutique approach.',
+        ],
+        team: [
+            'Get to know the talented individuals behind our projects, their expertise, and what drives them to create exceptional work.',
+            'Learn about our collaborative culture, team dynamics, and the people who make our boutique agency unique.',
+            'Insights from our team members about their craft, experience, and passion for creating meaningful digital experiences.',
+        ],
+        services: [
+            'Discover our comprehensive range of digital services, from concept to launch, tailored to meet your unique business needs.',
+            'Explore how our boutique approach to web development and design can elevate your brand and engage your audience.',
+            'Learn about our specialized services and methodology for creating impactful digital solutions that drive results.',
+        ],
+        thoughts: [
+            'Deep reflections on design philosophy, industry trends, and the principles that guide our creative approach.',
+            'Thoughtful perspectives on the intersection of technology, design, and human experience in the digital age.',
+            'Our insights on building meaningful connections through thoughtful design and authentic digital experiences.',
+        ],
+    };
 
   const authors = [
     'Alex Chen',
-    'Morgan Taylor',
+      'Morgan Taylor', 
     'Sam Rivera',
     'Jordan Kim',
     'Casey Martinez',
@@ -71,8 +93,11 @@ const generateMockContent = (startId: number, count: number = 10): ContentItem[]
   return Array.from({ length: count }, (_, index) => {
     const id = startId + index;
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    const randomTitle = titles[Math.floor(Math.random() * titles.length)];
-    const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+      const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+      const topicTitles = titlesByTopic[randomTopic];
+      const topicDescriptions = descriptionsByTopic[randomTopic];
+      const randomTitle = topicTitles[Math.floor(Math.random() * topicTitles.length)];
+      const randomDescription = topicDescriptions[Math.floor(Math.random() * topicDescriptions.length)];
     const randomAuthor = authors[Math.floor(Math.random() * authors.length)];
     
     // Generate realistic engagement metrics based on category
@@ -100,9 +125,10 @@ const generateMockContent = (startId: number, count: number = 10): ContentItem[]
 
     return {
       id: `content-${id}`,
-      title: `${randomTitle} ${id > 20 ? `(Part ${Math.floor(id / 20) + 1})` : ''}`,
+        title: randomTitle,
       description: randomDescription,
       category: randomCategory,
+        topic: randomTopic,
       createdAt: createdAt.toISOString(),
       views: baseViews,
       likes: baseLikes,
@@ -121,7 +147,8 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export const mockFetchContentBatch = async (
   batch: number,
   sortBy: SortOption = 'newest',
-  filterBy: FilterOption = 'all'
+    filterBy: FilterOption = 'all',
+    topic: TopicType = 'daily'
 ): Promise<ContentItem[]> => {
   // Simulate network delay
   await delay(400 + Math.random() * 600);
@@ -132,7 +159,10 @@ export const mockFetchContentBatch = async (
   // Generate content for this batch
   let content = generateMockContent(startId, batchSize);
 
-  // Apply filters
+    // Apply topic filter first
+    content = content.filter(item => item.topic === topic);
+
+    // Apply category filters
   if (filterBy !== 'all') {
     content = content.filter(item => item.category === filterBy);
   }
