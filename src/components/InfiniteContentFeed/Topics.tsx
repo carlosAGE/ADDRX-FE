@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from 'styled-components';
+import { fetchAllTags, type Tag } from './api';
 
 const TopicsContainer = styled.div`
   display: flex;
@@ -29,23 +30,21 @@ const TopicsList = styled.div`
 const TopicItem = styled.button<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: ${({ theme }) => theme.space.sm} ${({ theme }) => theme.space.md};
-  border: none;
   border-radius: ${({ theme }) => theme.radius.sm};
   font-size: 0.875rem;
   font-weight: 400;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
-  background: ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.surface : 'transparent'
-  };
-  color: ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.text : theme.colors.textMuted
-  };
-  border: 1px solid ${({ $isActive, theme }) => 
-    $isActive ? theme.colors.accent : 'transparent'
-  };
+  text-transform: capitalize;
+  background: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.surface : 'transparent'};
+  color: ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.text : theme.colors.textMuted};
+  border: 1px solid ${({ $isActive, theme }) =>
+    $isActive ? theme.colors.accent : 'transparent'};
 
   &:hover {
     background: ${({ theme }) => theme.colors.surface};
@@ -58,32 +57,44 @@ const TopicItem = styled.button<{ $isActive: boolean }>`
   }
 `;
 
-export type TopicType = 'daily' | 'team' | 'services' | 'thoughts';
+const CountBadge = styled.span`
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 99px;
+  background: ${({ theme }) => theme.colors.surface2};
+  color: ${({ theme }) => theme.colors.textMuted};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  min-width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+`;
 
 interface TopicsProps {
-  activeTopic: TopicType | null;
-  onTopicChange: (topic: TopicType | null) => void;
+  activeTagId: string | null;
+  onTagChange: (id: string | null) => void;
 }
 
-const Topics: React.FC<TopicsProps> = ({ activeTopic, onTopicChange }) => {
-  const topics = [
-    { value: 'daily', label: 'DAILY' },
-    { value: 'team', label: 'THE TEAM' },
-    { value: 'services', label: 'SERVICES' },
-    { value: 'thoughts', label: 'THOUGHTS' },
-  ] as const;
+const Topics: React.FC<TopicsProps> = ({ activeTagId, onTagChange }) => {
+  const [tags, setTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    fetchAllTags().then(setTags);
+  }, []);
 
   return (
     <TopicsContainer>
       <TopicsTitle>Topics</TopicsTitle>
       <TopicsList>
-        {topics.map((topic) => (
+        {tags.map(tag => (
           <TopicItem
-            key={topic.value}
-            $isActive={activeTopic === topic.value}
-            onClick={() => onTopicChange(activeTopic === topic.value ? null : topic.value)}
+            key={tag.id}
+            $isActive={activeTagId === tag.id}
+            onClick={() => onTagChange(activeTagId === tag.id ? null : tag.id)}
           >
-            {topic.label}
+            {tag.name}
+            <CountBadge>
+              {(tag.postCount ?? 0) > 99 ? '99+' : tag.postCount ?? 0}
+            </CountBadge>
           </TopicItem>
         ))}
       </TopicsList>

@@ -3,9 +3,9 @@ import { styled } from 'styled-components';
 import ContentItem from './ContentItem.tsx';
 import FeedDropdown from './FeedDropdown.tsx';
 import Bio from './Bio.tsx';
-import Topics, { type TopicType } from './Topics.tsx';
+import Topics from './Topics.tsx';
 import PostDetailsContainer from './PostDetailsContainer.tsx';
-import { fetchContentBatch, fetchPostById, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './api.ts';
+import { fetchContentBatch, fetchPostById, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './api';
 
 const MainLayout = styled.div`
   display: grid;
@@ -115,7 +115,7 @@ const InfiniteContentFeed: React.FC = () => {
   const [currentBatch, setCurrentBatch] = useState(1);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
-  const [activeTopic, setActiveTopic] = useState<TopicType | null>(null);
+  const [activeTagId, setActiveTagId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'feed' | 'post'>('feed');
   const [selectedPost, setSelectedPost] = useState<ContentItemType | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -145,7 +145,7 @@ const InfiniteContentFeed: React.FC = () => {
 
     setLoading(true);
     try {
-      const newItems = await fetchContentBatch(currentBatch, sortBy, filterBy, activeTopic);
+      const newItems = await fetchContentBatch(currentBatch, sortBy, filterBy, activeTagId);
       
       if (newItems.length === 0) {
         setHasMore(false);
@@ -159,7 +159,7 @@ const InfiniteContentFeed: React.FC = () => {
           newUrl.searchParams.set('batch', currentBatch.toString());
           if (sortBy !== 'newest') newUrl.searchParams.set('sort', sortBy);
           if (filterBy !== 'all') newUrl.searchParams.set('filter', filterBy);
-          if (activeTopic) newUrl.searchParams.set('topic', activeTopic);
+          if (activeTagId) newUrl.searchParams.set('topic', activeTagId);
           window.history.replaceState({}, '', newUrl);
         }
       }
@@ -168,7 +168,7 @@ const InfiniteContentFeed: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentBatch, sortBy, filterBy, activeTopic, currentView]);
+  }, [loading, hasMore, currentBatch, sortBy, filterBy, activeTagId, currentView]);
 
   // Intersection Observer setup
   useEffect(() => {
@@ -208,7 +208,7 @@ const InfiniteContentFeed: React.FC = () => {
     const loadInitialContent = async () => {
       setLoading(true);
       try {
-        const newItems = await fetchContentBatch(1, sortBy, filterBy, activeTopic);
+        const newItems = await fetchContentBatch(1, sortBy, filterBy, activeTagId);
         setItems(newItems);
         setCurrentBatch(2);
         
@@ -225,8 +225,8 @@ const InfiniteContentFeed: React.FC = () => {
         } else {
           newUrl.searchParams.delete('filter');
         }
-        if (activeTopic) {
-          newUrl.searchParams.set('topic', activeTopic);
+        if (activeTagId) {
+          newUrl.searchParams.set('topic', activeTagId);
         } else {
           newUrl.searchParams.delete('topic');
         }
@@ -240,7 +240,7 @@ const InfiniteContentFeed: React.FC = () => {
     };
 
     loadInitialContent();
-  }, [sortBy, filterBy, activeTopic]);
+  }, [sortBy, filterBy, activeTagId]);
 
   // Load initial content on mount
   useEffect(() => {
@@ -248,7 +248,6 @@ const InfiniteContentFeed: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlSort = urlParams.get('sort') as SortOption;
     const urlFilter = urlParams.get('filter') as FilterOption;
-    const urlTopic = urlParams.get('topic') as TopicType;
     const urlBatch = urlParams.get('batch');
     const urlPost = urlParams.get('post');
 
@@ -257,9 +256,6 @@ const InfiniteContentFeed: React.FC = () => {
     }
     if (urlFilter && ['all', 'featured', 'trending'].includes(urlFilter)) {
       setFilterBy(urlFilter);
-    }
-    if (urlTopic && ['daily', 'team', 'services', 'thoughts'].includes(urlTopic)) {
-      setActiveTopic(urlTopic);
     }
     if (urlBatch && !isNaN(Number(urlBatch))) {
       setCurrentBatch(Number(urlBatch));
@@ -295,9 +291,9 @@ const InfiniteContentFeed: React.FC = () => {
   return (
     <MainLayout>
       <SidebarContainer>
-        <Topics 
-          activeTopic={activeTopic}
-          onTopicChange={setActiveTopic}
+        <Topics
+          activeTagId={activeTagId}
+          onTagChange={setActiveTagId}
         />
       </SidebarContainer>
       

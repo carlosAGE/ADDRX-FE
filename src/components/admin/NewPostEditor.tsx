@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { styled } from 'styled-components';
 import { supabase } from '../../lib/supabase';
 import AuthGuard from './AuthGuard';
-import type { TopicType } from '../InfiniteContentFeed/api';
+import TagInput, { type SelectedTag } from './TagInput';
+import { upsertTag } from '../InfiniteContentFeed/api';
 
 // ─── Layout ────────────────────────────────────────────────────────────────
 
@@ -158,7 +159,6 @@ const SubmitButton = styled.button`
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
-const TOPICS: TopicType[] = ['daily', 'team', 'services', 'thoughts'];
 const CATEGORIES = ['regular', 'trending', 'featured'] as const;
 type Category = typeof CATEGORIES[number];
 
@@ -166,7 +166,7 @@ function NewPostEditorContent() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [authorName, setAuthorName] = useState('');
-  const [topic, setTopic] = useState<TopicType>('daily');
+  const [tags, setTags] = useState<SelectedTag[]>([]);
   const [category, setCategory] = useState<Category>('regular');
   const [status, setStatus] = useState<{ msg: string; error: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -182,20 +182,47 @@ function NewPostEditorContent() {
       return;
     }
 
-    const { error } = await supabase.from('content_items').insert({
-      title: title.trim(),
-      description: description.trim(),
-      author_name: authorName.trim(),
-      topic,
-      category,
-      views: 0,
-      likes: 0,
-    });
+    // Resolve all tags — upsert new ones to get real IDs
+    const resolvedTags = await Promise.all(
+      tags.map(async tag => {
+        if (tag.id) return tag as { id: string; name: string };
+        const created = await upsertTag(tag.name);
+        return created ? { id: created.id, name: created.name } : null;
+      })
+    );
 
-    if (error) {
-      setStatus({ msg: error.message, error: true });
+    const validTags = resolvedTags.filter(Boolean) as { id: string; name: string }[];
+
+    // Insert the post
+    const { data: post, error: postError } = await supabase
+      .from('content_items')
+      .insert({
+        title: title.trim(),
+        description: description.trim(),
+        author_name: authorName.trim(),
+        category,
+        views: 0,
+        likes: 0,
+      })
+      .select('id')
+      .single();
+
+    if (postError) {
+      setStatus({ msg: postError.message, error: true });
       setLoading(false);
       return;
+    }
+
+    // Link tags to post
+    if (validTags.length > 0) {
+      const { error: tagError } = await supabase.from('content_item_tags').insert(
+        validTags.map(tag => ({ content_item_id: post.id, tag_id: tag.id }))
+      );
+      if (tagError) {
+        setStatus({ msg: tagError.message, error: true });
+        setLoading(false);
+        return;
+      }
     }
 
     setStatus({ msg: 'Post published.', error: false });
@@ -203,7 +230,7 @@ function NewPostEditorContent() {
     setTitle('');
     setDescription('');
     setAuthorName('');
-    setTopic('daily');
+    setTags([]);
     setCategory('regular');
   };
 
@@ -253,19 +280,8 @@ function NewPostEditorContent() {
           </Field>
 
           <Field>
-            <Label>Topic</Label>
-            <SegmentRow>
-              {TOPICS.map(t => (
-                <Segment
-                  key={t}
-                  type="button"
-                  $active={topic === t}
-                  onClick={() => setTopic(t)}
-                >
-                  {t}
-                </Segment>
-              ))}
-            </SegmentRow>
+            <Label>Tags</Label>
+            <TagInput value={tags} onChange={setTags} />
           </Field>
 
           <Field>

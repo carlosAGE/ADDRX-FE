@@ -99,6 +99,24 @@ const ItemDate = styled.time`
   font-weight: 300;
 `;
 
+const TagRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: ${({ theme }) => theme.space.md};
+`;
+
+const TagPill = styled.span`
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: ${({ theme }) => theme.radius.sm};
+  background: rgba(156, 163, 175, 0.08);
+  color: ${({ theme }) => theme.colors.textMuted};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  letter-spacing: 0.03em;
+  text-transform: lowercase;
+`;
+
 const ItemDescription = styled.p`
   font-size: 0.875rem;
   line-height: 1.6;
@@ -183,6 +201,14 @@ const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
           </ItemDate>
         </ItemMeta>
       </ItemHeader>
+
+      {item.tags.length > 0 && (
+        <TagRow>
+          {item.tags.map(tag => (
+            <TagPill key={tag.id}>{tag.name}</TagPill>
+          ))}
+        </TagRow>
+      )}
 
       <ItemDescription>{item.description}</ItemDescription>
 
