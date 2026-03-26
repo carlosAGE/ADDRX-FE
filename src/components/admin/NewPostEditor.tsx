@@ -123,7 +123,6 @@ const Segment = styled.button<{ $active: boolean }>`
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.15s;
-  type: button;
 `;
 
 // ─── Bottom row ────────────────────────────────────────────────────────────
@@ -176,6 +175,12 @@ function NewPostEditorContent() {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = '/admin';
+      return;
+    }
 
     const { error } = await supabase.from('content_items').insert({
       title: title.trim(),

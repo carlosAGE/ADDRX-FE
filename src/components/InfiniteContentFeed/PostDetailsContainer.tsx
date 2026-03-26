@@ -172,20 +172,6 @@ const PostDetailsContainer: React.FC<PostDetailsContainerProps> = ({ item, onBac
     return num.toString();
   };
 
-  // Generate extended content for the detailed view
-  const generateExtendedContent = (description: string) => {
-    const paragraphs = [
-      description,
-      "This detailed exploration delves deeper into the concepts and methodologies that shape our approach to modern digital experiences. We believe in creating solutions that not only meet immediate needs but also evolve with changing requirements.",
-      "Our boutique methodology emphasizes quality over quantity, ensuring that every element serves a purpose and contributes to the overall user experience. This attention to detail is what sets our work apart in an increasingly crowded digital landscape.",
-      "Through careful consideration of both technical excellence and human-centered design principles, we craft experiences that resonate with users on multiple levels. The result is work that not only functions beautifully but also creates meaningful connections.",
-    ];
-
-    return paragraphs.map((para, index) => (
-      <p key={index}>{para}</p>
-    ));
-  };
-
   return (
     <PostContainer>
       <PostHeader>
@@ -209,21 +195,7 @@ const PostDetailsContainer: React.FC<PostDetailsContainerProps> = ({ item, onBac
       </PostHeader>
 
       <PostContent>
-        {generateExtendedContent(item.description)}
-        
-        <h2>Key Insights</h2>
-        <p>
-          The approach we've outlined here represents our commitment to thoughtful, sustainable development practices. 
-          By focusing on these core principles, we ensure that our work remains relevant and impactful long after 
-          initial implementation.
-        </p>
-        
-        <h3>Looking Forward</h3>
-        <p>
-          As we continue to evolve our methodology, we remain committed to the principles that have guided us from 
-          the beginning: authenticity, quality, and meaningful connection. These values inform every decision we make 
-          and every solution we craft.
-        </p>
+        <p>{item.description}</p>
       </PostContent>
 
       <PostStats>
