@@ -19,6 +19,7 @@ export interface ContentItem {
   views: number;
   likes: number;
   comments?: number;
+  link?: string;
   author: {
     name: string;
     avatar?: string;
@@ -39,6 +40,7 @@ const mapRow = (row: Record<string, unknown>): ContentItem => ({
   views: row.views as number,
   likes: row.likes as number,
   comments: row.comments as number | undefined,
+  link: row.link as string | undefined,
   author: {
     name: row.author_name as string,
     avatar: row.author_avatar as string | undefined,

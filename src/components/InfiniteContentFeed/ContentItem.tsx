@@ -1,6 +1,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import type { ContentItem as ContentItemType } from './api';
+import { getYouTubeId, getYouTubeThumbnail } from '../../utils/youtube';
 
 const ItemContainer = styled.article`
   background: ${({ theme }) => theme.colors.surface};
@@ -97,6 +98,48 @@ const ItemDate = styled.time`
   font-size: 0.75rem;
   color: ${({ theme }) => theme.colors.textMuted};
   font-weight: 300;
+`;
+
+const Thumbnail = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: ${({ theme }) => theme.radius.sm};
+  overflow: hidden;
+  margin-bottom: ${({ theme }) => theme.space.md};
+  cursor: pointer;
+  background: ${({ theme }) => theme.colors.bg};
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+`;
+
+const PlayButton = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  transition: background 0.2s;
+
+  ${Thumbnail}:hover & {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 0 12px 22px;
+    border-color: transparent transparent transparent #fff;
+    margin-left: 4px;
+  }
 `;
 
 const TagRow = styled.div`
@@ -209,6 +252,17 @@ const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
           </ItemDate>
         </ItemMeta>
       </ItemHeader>
+
+      {item.link && getYouTubeId(item.link) && (
+        <Thumbnail onClick={() => onViewPost(item)}>
+          <img
+            src={getYouTubeThumbnail(item.link)!}
+            alt={item.title}
+            loading="lazy"
+          />
+          <PlayButton />
+        </Thumbnail>
+      )}
 
       {item.tags.length > 0 && (
         <TagRow>

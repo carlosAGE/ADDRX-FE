@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { styled } from 'styled-components';
 import type { ContentItem } from './api';
+import { getYouTubeEmbedUrl } from '../../utils/youtube';
 
 const PostContainer = styled.div`
   max-width: 100%;
@@ -107,6 +108,24 @@ const PostAuthor = styled.span`
   font-weight: 300;
 `;
 
+const VideoEmbed = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: ${({ theme }) => theme.radius.md};
+  overflow: hidden;
+  margin-bottom: ${({ theme }) => theme.space.xl};
+  background: ${({ theme }) => theme.colors.bg};
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+`;
+
 const PostContent = styled.div`
   line-height: 1.7;
   color: ${({ theme }) => theme.colors.text};
@@ -205,6 +224,17 @@ const PostDetailsContainer: React.FC<PostDetailsContainerProps> = ({ item, onBac
           </PostAuthor>
         </PostMeta>
       </PostHeader>
+
+      {item.link && getYouTubeEmbedUrl(item.link) && (
+        <VideoEmbed>
+          <iframe
+            src={getYouTubeEmbedUrl(item.link)!}
+            title={item.title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </VideoEmbed>
+      )}
 
       <PostContent>
         {renderContent(item.description)}

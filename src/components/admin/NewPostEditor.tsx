@@ -167,6 +167,7 @@ function NewPostEditorContent() {
   const [description, setDescription] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [tags, setTags] = useState<SelectedTag[]>([]);
+  const [link, setLink] = useState('');
   const [category, setCategory] = useState<Category>('regular');
   const [status, setStatus] = useState<{ msg: string; error: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -201,6 +202,7 @@ function NewPostEditorContent() {
         description: description.trim(),
         author_name: authorName.trim(),
         category,
+        link: link.trim() || null,
         views: 0,
         likes: 0,
       })
@@ -231,6 +233,7 @@ function NewPostEditorContent() {
     setDescription('');
     setAuthorName('');
     setTags([]);
+    setLink('');
     setCategory('regular');
   };
 
@@ -276,6 +279,17 @@ function NewPostEditorContent() {
               value={authorName}
               onChange={e => setAuthorName(e.target.value)}
               required
+            />
+          </Field>
+
+          <Field>
+            <Label htmlFor="link">YouTube Link <span style={{ fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>(optional)</span></Label>
+            <Input
+              id="link"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={link}
+              onChange={e => setLink(e.target.value)}
             />
           </Field>
 
