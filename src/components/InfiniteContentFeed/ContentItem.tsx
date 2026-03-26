@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from 'styled-components';
-import type { ContentItem as ContentItemType } from './mockApi';
+import type { ContentItem as ContentItemType } from './api';
 
 const ItemContainer = styled.article`
   background: ${({ theme }) => theme.colors.surface};

@@ -5,7 +5,7 @@ import FeedDropdown from './FeedDropdown.tsx';
 import Bio from './Bio.tsx';
 import Topics, { type TopicType } from './Topics.tsx';
 import PostDetailsContainer from './PostDetailsContainer.tsx';
-import { mockFetchContentBatch, mockFetchPostById, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './mockApi.ts';
+import { fetchContentBatch, fetchPostById, type ContentItem as ContentItemType, type SortOption, type FilterOption } from './api.ts';
 
 const MainLayout = styled.div`
   display: grid;
@@ -145,7 +145,7 @@ const InfiniteContentFeed: React.FC = () => {
 
     setLoading(true);
     try {
-      const newItems = await mockFetchContentBatch(currentBatch, sortBy, filterBy, activeTopic);
+      const newItems = await fetchContentBatch(currentBatch, sortBy, filterBy, activeTopic);
       
       if (newItems.length === 0) {
         setHasMore(false);
@@ -208,7 +208,7 @@ const InfiniteContentFeed: React.FC = () => {
     const loadInitialContent = async () => {
       setLoading(true);
       try {
-        const newItems = await mockFetchContentBatch(1, sortBy, filterBy, activeTopic);
+        const newItems = await fetchContentBatch(1, sortBy, filterBy, activeTopic);
         setItems(newItems);
         setCurrentBatch(2);
         
@@ -269,7 +269,7 @@ const InfiniteContentFeed: React.FC = () => {
     if (urlPost) {
       const loadSpecificPost = async () => {
         try {
-          const post = await mockFetchPostById(urlPost);
+          const post = await fetchPostById(urlPost);
           if (post) {
             setSelectedPost(post);
             setCurrentView('post');

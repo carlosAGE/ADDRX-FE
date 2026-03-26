@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from 'styled-components';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import type { SortOption, FilterOption } from './mockApi';
+import type { SortOption, FilterOption } from './api';
 
 const SidebarContainer = styled.div`
   display: flex;

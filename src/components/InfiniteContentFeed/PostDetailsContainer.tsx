@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled } from 'styled-components';
-import type { ContentItem } from './mockApi';
+import type { ContentItem } from './api';
 
 const PostContainer = styled.div`
   max-width: 100%;
