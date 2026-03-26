@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { styled } from 'styled-components';
 import type { ContentItem } from './api';
 
@@ -172,6 +172,18 @@ const PostDetailsContainer: React.FC<PostDetailsContainerProps> = ({ item, onBac
     return num.toString();
   };
 
+  const renderContent = (text: string) =>
+    text.split(/\n\n+/).map((para, i) => (
+      <p key={i}>
+        {para.split('\n').map((line, j, arr) => (
+          <Fragment key={j}>
+            {line}
+            {j < arr.length - 1 && <br />}
+          </Fragment>
+        ))}
+      </p>
+    ));
+
   return (
     <PostContainer>
       <PostHeader>
@@ -195,7 +207,7 @@ const PostDetailsContainer: React.FC<PostDetailsContainerProps> = ({ item, onBac
       </PostHeader>
 
       <PostContent>
-        <p>{item.description}</p>
+        {renderContent(item.description)}
       </PostContent>
 
       <PostStats>

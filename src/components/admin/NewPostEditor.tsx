@@ -98,7 +98,7 @@ const Textarea = styled.textarea`
   font-size: 0.95rem;
   outline: none;
   resize: vertical;
-  min-height: 120px;
+  min-height: 240px;
   line-height: 1.6;
   font-family: inherit;
   transition: border-color 0.15s;

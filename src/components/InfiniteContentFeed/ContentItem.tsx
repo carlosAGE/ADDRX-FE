@@ -171,6 +171,14 @@ interface ContentItemProps {
   onViewPost: (post: ContentItemType) => void;
 }
 
+const truncate = (text: string, max: number) => {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut) + '…';
+};
+
 const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -210,7 +218,7 @@ const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
         </TagRow>
       )}
 
-      <ItemDescription>{item.description}</ItemDescription>
+      <ItemDescription>{truncate(item.description, 500)}</ItemDescription>
 
       <ItemFooter>
         <ItemStats>
