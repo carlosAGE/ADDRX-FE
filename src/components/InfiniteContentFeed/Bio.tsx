@@ -26,9 +26,9 @@ const BioDescription = styled.p`
 const Bio: React.FC = () => {
   return (
     <BioContainer>
-      <BioTitle>Content Feed</BioTitle>
+      <BioTitle>ADDRX</BioTitle>
       <BioDescription>
-        Boutique site that works for you. Join us on our next build and get featured
+        Join us on our next build and get featured
       </BioDescription>
     </BioContainer>
   );
