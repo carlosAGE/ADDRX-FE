@@ -43,7 +43,7 @@ export const fetchContentBatch = async (
   batch: number,
   sortBy: SortOption = 'newest',
   filterBy: FilterOption = 'all',
-  topic: TopicType = 'daily'
+  topic: TopicType | null = null
 ): Promise<ContentItem[]> => {
   const from = (batch - 1) * BATCH_SIZE;
   const to = from + BATCH_SIZE - 1;
@@ -51,8 +51,11 @@ export const fetchContentBatch = async (
   let query = supabase
     .from('content_items')
     .select('*')
-    .eq('topic', topic)
     .range(from, to);
+
+  if (topic) {
+    query = query.eq('topic', topic);
+  }
 
   if (filterBy !== 'all') {
     query = query.eq('category', filterBy);

@@ -61,8 +61,8 @@ const TopicItem = styled.button<{ $isActive: boolean }>`
 export type TopicType = 'daily' | 'team' | 'services' | 'thoughts';
 
 interface TopicsProps {
-  activeTopic: TopicType;
-  onTopicChange: (topic: TopicType) => void;
+  activeTopic: TopicType | null;
+  onTopicChange: (topic: TopicType | null) => void;
 }
 
 const Topics: React.FC<TopicsProps> = ({ activeTopic, onTopicChange }) => {
@@ -81,7 +81,7 @@ const Topics: React.FC<TopicsProps> = ({ activeTopic, onTopicChange }) => {
           <TopicItem
             key={topic.value}
             $isActive={activeTopic === topic.value}
-            onClick={() => onTopicChange(topic.value)}
+            onClick={() => onTopicChange(activeTopic === topic.value ? null : topic.value)}
           >
             {topic.label}
           </TopicItem>

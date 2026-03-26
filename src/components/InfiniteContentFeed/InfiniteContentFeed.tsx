@@ -115,7 +115,7 @@ const InfiniteContentFeed: React.FC = () => {
   const [currentBatch, setCurrentBatch] = useState(1);
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
-  const [activeTopic, setActiveTopic] = useState<TopicType>('daily');
+  const [activeTopic, setActiveTopic] = useState<TopicType | null>(null);
   const [currentView, setCurrentView] = useState<'feed' | 'post'>('feed');
   const [selectedPost, setSelectedPost] = useState<ContentItemType | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -159,7 +159,7 @@ const InfiniteContentFeed: React.FC = () => {
           newUrl.searchParams.set('batch', currentBatch.toString());
           if (sortBy !== 'newest') newUrl.searchParams.set('sort', sortBy);
           if (filterBy !== 'all') newUrl.searchParams.set('filter', filterBy);
-          if (activeTopic !== 'daily') newUrl.searchParams.set('topic', activeTopic);
+          if (activeTopic) newUrl.searchParams.set('topic', activeTopic);
           window.history.replaceState({}, '', newUrl);
         }
       }
@@ -225,7 +225,7 @@ const InfiniteContentFeed: React.FC = () => {
         } else {
           newUrl.searchParams.delete('filter');
         }
-        if (activeTopic !== 'daily') {
+        if (activeTopic) {
           newUrl.searchParams.set('topic', activeTopic);
         } else {
           newUrl.searchParams.delete('topic');
