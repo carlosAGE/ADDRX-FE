@@ -5,6 +5,12 @@ const BioContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.space.xs};
+
+  @media (max-width: 1024px) {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
 `;
 
 const BioTitle = styled.h1`

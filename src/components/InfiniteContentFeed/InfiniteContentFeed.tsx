@@ -58,6 +58,95 @@ const SidebarContainer = styled.div`
   }
 `;
 
+const DrawerOverlay = styled.div<{ $open: boolean }>`
+  display: none;
+  @media (max-width: 1024px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 40;
+    opacity: ${({ $open }) => $open ? 1 : 0};
+    pointer-events: ${({ $open }) => $open ? 'all' : 'none'};
+    transition: opacity 0.25s ease;
+  }
+`;
+
+const DrawerPanel = styled.div<{ $open: boolean; $side: 'left' | 'right' }>`
+  display: none;
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    background: ${({ theme }) => theme.colors.surface};
+    z-index: 50;
+    overflow-y: auto;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    ${({ $side, theme }) => $side === 'left'
+      ? `left: 0; border-right: 1px solid ${theme.colors.border};`
+      : `right: 0; border-left: 1px solid ${theme.colors.border};`
+    }
+    transform: translateX(${({ $open, $side }) =>
+      $open ? '0' : ($side === 'left' ? '-100%' : '100%')
+    });
+  }
+`;
+
+const DrawerHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${({ theme }) => theme.space.md} ${({ theme }) => theme.space.lg};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  flex-shrink: 0;
+`;
+
+const DrawerTitle = styled.span`
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textMuted};
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+`;
+
+const DrawerClose = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.textMuted};
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  &:hover { color: ${({ theme }) => theme.colors.text}; }
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  @media (max-width: 1024px) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: ${({ theme }) => theme.colors.surface};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: ${({ theme }) => theme.radius.sm};
+    color: ${({ theme }) => theme.colors.textMuted};
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: ${({ theme }) => `${theme.space.xs} ${theme.space.sm}`};
+    cursor: pointer;
+    &:hover {
+      color: ${({ theme }) => theme.colors.text};
+      border-color: ${({ theme }) => theme.colors.accent};
+    }
+  }
+`;
+
 const FeedHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -116,6 +205,8 @@ const InfiniteContentFeed: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [activeTagId, setActiveTagId] = useState<string | null>(null);
+  const [leftOpen, setLeftOpen] = useState(false);
+  const [rightOpen, setRightOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'feed' | 'post'>('feed');
   const [selectedPost, setSelectedPost] = useState<ContentItemType | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -288,7 +379,36 @@ const InfiniteContentFeed: React.FC = () => {
     }
   }, []);
 
+  const closeDrawers = () => { setLeftOpen(false); setRightOpen(false); };
+
   return (
+    <>
+      <DrawerOverlay $open={leftOpen || rightOpen} onClick={closeDrawers} />
+
+      <DrawerPanel $open={leftOpen} $side="left">
+        <DrawerHeader>
+          <DrawerTitle>Topics</DrawerTitle>
+          <DrawerClose onClick={() => setLeftOpen(false)}>✕</DrawerClose>
+        </DrawerHeader>
+        <Topics
+          activeTagId={activeTagId}
+          onTagChange={(id) => { setActiveTagId(id); setLeftOpen(false); }}
+        />
+      </DrawerPanel>
+
+      <DrawerPanel $open={rightOpen} $side="right">
+        <DrawerHeader>
+          <DrawerTitle>Filters</DrawerTitle>
+          <DrawerClose onClick={() => setRightOpen(false)}>✕</DrawerClose>
+        </DrawerHeader>
+        <FeedDropdown
+          sortBy={sortBy}
+          filterBy={filterBy}
+          onSortChange={setSortBy}
+          onFilterChange={setFilterBy}
+        />
+      </DrawerPanel>
+
     <MainLayout>
       <SidebarContainer>
         <Topics
@@ -296,11 +416,17 @@ const InfiniteContentFeed: React.FC = () => {
           onTagChange={setActiveTagId}
         />
       </SidebarContainer>
-      
+
       <ContentWrapper>
         <FeedContainer $isVisible={currentView === 'feed'}>
           <FeedHeader>
+            <MobileMenuButton onClick={() => setLeftOpen(true)}>
+              ☰ Topics
+            </MobileMenuButton>
             <Bio />
+            <MobileMenuButton onClick={() => setRightOpen(true)}>
+              Filters ☰
+            </MobileMenuButton>
           </FeedHeader>
           
           <FeedGrid>
@@ -340,7 +466,7 @@ const InfiniteContentFeed: React.FC = () => {
       </ContentWrapper>
 
       <SidebarContainer>
-        <FeedDropdown 
+        <FeedDropdown
           sortBy={sortBy}
           filterBy={filterBy}
           onSortChange={setSortBy}
@@ -348,6 +474,7 @@ const InfiniteContentFeed: React.FC = () => {
         />
       </SidebarContainer>
     </MainLayout>
+    </>
   );
 };
 
