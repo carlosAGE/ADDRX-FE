@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useDrawer } from '../../context/DrawerContext';
 import { styled } from 'styled-components';
 import ContentItem from './ContentItem.tsx';
 import FeedDropdown from './FeedDropdown.tsx';
@@ -125,27 +126,6 @@ const DrawerClose = styled.button`
   &:hover { color: ${({ theme }) => theme.colors.text}; }
 `;
 
-const MobileMenuButton = styled.button`
-  display: none;
-  @media (max-width: 1024px) {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: ${({ theme }) => theme.colors.surface};
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    border-radius: ${({ theme }) => theme.radius.sm};
-    color: ${({ theme }) => theme.colors.textMuted};
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    padding: ${({ theme }) => `${theme.space.xs} ${theme.space.sm}`};
-    cursor: pointer;
-    &:hover {
-      color: ${({ theme }) => theme.colors.text};
-      border-color: ${({ theme }) => theme.colors.accent};
-    }
-  }
-`;
 
 const FeedHeader = styled.div`
   display: flex;
@@ -205,8 +185,12 @@ const InfiniteContentFeed: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
   const [activeTagId, setActiveTagId] = useState<string | null>(null);
-  const [leftOpen, setLeftOpen] = useState(false);
-  const [rightOpen, setRightOpen] = useState(false);
+  const { leftOpen, rightOpen, setLeftOpen, setRightOpen, setFeedActive } = useDrawer();
+
+  useEffect(() => {
+    setFeedActive(true);
+    return () => setFeedActive(false);
+  }, [setFeedActive]);
   const [currentView, setCurrentView] = useState<'feed' | 'post'>('feed');
   const [selectedPost, setSelectedPost] = useState<ContentItemType | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -420,13 +404,7 @@ const InfiniteContentFeed: React.FC = () => {
       <ContentWrapper>
         <FeedContainer $isVisible={currentView === 'feed'}>
           <FeedHeader>
-            <MobileMenuButton onClick={() => setLeftOpen(true)}>
-              ☰ Topics
-            </MobileMenuButton>
             <Bio />
-            <MobileMenuButton onClick={() => setRightOpen(true)}>
-              Filters ☰
-            </MobileMenuButton>
           </FeedHeader>
           
           <FeedGrid>

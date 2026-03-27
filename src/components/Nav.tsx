@@ -1,5 +1,6 @@
 import React from "react";
 import { styled, useTheme, keyframes, css } from "styled-components";
+import { useDrawer } from "../context/DrawerContext";
 import AX from "../../public/icons/AX";
 
 /** Animations */
@@ -37,10 +38,7 @@ const StyledNav = styled.nav<{ $mounted: boolean }>`
     width: 100%;
     max-width: min(90vw, 900px);
 
-    justify-content: center; /* mobile default */
-    @media (min-width: 768px) {
-      justify-content: space-between;
-    }
+    justify-content: space-between;
   }
 
   .leftGroup,
@@ -121,9 +119,33 @@ const StyledNav = styled.nav<{ $mounted: boolean }>`
 //   }
 // `;
 
+const NavDrawerButton = styled.button`
+  display: none;
+  @media (max-width: 1024px) {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: rgba(229,231,235,0.5);
+    font-size: 0.7rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    &:hover {
+      color: rgba(229,231,235,1);
+      border-color: rgba(255,255,255,0.25);
+    }
+  }
+`;
+
 export default function Nav() {
   const theme = useTheme() as any;
   const [mounted, setMounted] = React.useState(false);
+  const { setLeftOpen, setRightOpen, feedActive } = useDrawer();
 
   React.useEffect(() => {
     const id = requestAnimationFrame(() => setMounted(true));
@@ -134,16 +156,17 @@ export default function Nav() {
     <StyledNav $mounted={mounted}>
       <div className="navContainer">
         <div className="linksContainer">
-          {/* <div className="leftGroup"> */}
-          {/* <StyledLink href="/">Home</StyledLink>
-            <StyledLink href="/about">About</StyledLink> */}
-          {/* </div> */}
+          <div className="leftGroup">
+            {feedActive && (
+              <NavDrawerButton onClick={() => setLeftOpen(true)}>
+                ☰ Topics
+              </NavDrawerButton>
+            )}
+          </div>
 
           <div className="iconContainer">
             <button
-              onClick={() => {
-                window.location.href = "/";
-              }}
+              onClick={() => { window.location.href = "/"; }}
               aria-label="Go home"
             >
               <AX
@@ -153,10 +176,13 @@ export default function Nav() {
             </button>
           </div>
 
-          {/* <div className="rightGroup"> */}
-          {/* <StyledLink href="/contact">Contact</StyledLink>
-            <StyledLink href="/archive">Archive</StyledLink> */}
-          {/* </div> */}
+          <div className="rightGroup">
+            {feedActive && (
+              <NavDrawerButton onClick={() => setRightOpen(true)}>
+                Filters ☰
+              </NavDrawerButton>
+            )}
+          </div>
         </div>
       </div>
     </StyledNav>
