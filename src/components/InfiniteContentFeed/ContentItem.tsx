@@ -279,9 +279,9 @@ const ContentItem: React.FC<ContentItemProps> = ({ item, onViewPost }) => {
           <ItemStat>
             👁 {formatNumber(item.views)}
           </ItemStat>
-          <ItemStat>
+          {/* <ItemStat>
             ❤️ {formatNumber(item.likes)}
-          </ItemStat>
+          </ItemStat> */}
           {item.comments && (
             <ItemStat>
               💬 {formatNumber(item.comments)}

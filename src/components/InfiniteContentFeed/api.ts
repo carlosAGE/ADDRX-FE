@@ -60,7 +60,7 @@ export const fetchContentBatch = async (
     ? '*, content_item_tags!inner(tags(id, name))'
     : '*, content_item_tags(tags(id, name))';
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic select string breaks Supabase's generic inference
   let query: any = supabase.from('content_items').select(selectStr).range(from, to);
 
   if (activeTagId) {
@@ -113,11 +113,18 @@ export const fetchAllTags = async (): Promise<Tag[]> => {
 };
 
 export const upsertTag = async (name: string): Promise<Tag | null> => {
+  const normalized = name.toLowerCase().trim();
+
+  // Insert — ignore if it already exists (unique constraint on name)
+  await supabase.from('tags').insert({ name: normalized }).select().maybeSingle();
+
+  // Always fetch by name so we get the ID whether it was just created or already existed
   const { data, error } = await supabase
     .from('tags')
-    .upsert({ name: name.toLowerCase().trim() }, { onConflict: 'name' })
     .select('id, name')
+    .eq('name', normalized)
     .single();
+
   if (error) return null;
   return data as Tag;
 };

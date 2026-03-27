@@ -183,16 +183,16 @@ function NewPostEditorContent() {
       return;
     }
 
-    // Resolve all tags — upsert new ones to get real IDs
-    const resolvedTags = await Promise.all(
-      tags.map(async tag => {
-        if (tag.id) return tag as { id: string; name: string };
+    // Resolve tags sequentially — upsert new ones to get real IDs
+    const validTags: { id: string; name: string }[] = [];
+    for (const tag of tags) {
+      if (tag.id) {
+        validTags.push({ id: tag.id, name: tag.name });
+      } else {
         const created = await upsertTag(tag.name);
-        return created ? { id: created.id, name: created.name } : null;
-      })
-    );
-
-    const validTags = resolvedTags.filter(Boolean) as { id: string; name: string }[];
+        if (created) validTags.push({ id: created.id, name: created.name });
+      }
+    }
 
     // Insert the post
     const { data: post, error: postError } = await supabase
